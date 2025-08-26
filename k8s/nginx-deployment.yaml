@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: donation-app
+data:
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    
+    http {
+        upstream backend {
+            server donation-backend:5000;
+        }
+        
+        server {
+            listen 80;
+            server_name _;
+            
+            # Базовая страница nginx
+            location / {
+                return 200 '<html><head><title>Donation App</title></head><body><h1>Welcome to Donation App</h1><p>Backend is running at <a href="/api/health">/api/health</a></p></body></html>';
+                add_header Content-Type text/html;
+            }
+            
+            # Проксирование API запросов к бэкенду
+            location /api/ {
+                proxy_pass http://backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                
+                # WebSocket support
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+            }
+        }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: donation-nginx
+  namespace: donation-app
+  labels:
+    app: donation-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: donation-nginx
+  template:
+    metadata:
+      labels:
+        app: donation-nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25-alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: donation-nginx
+  namespace: donation-app
+  labels:
+    app: donation-nginx
+spec:
+  selector:
+    app: donation-nginx
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    nodePort: 30080
+  type: NodePort
