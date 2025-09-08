@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: donation-backend
+  namespace: donation-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: donation-backend
+  template:
+    metadata:
+      labels:
+        app: donation-backend
+    spec:
+      containers:
+      - name: backend
+        image: docker.io/<DOCKER_USERNAME>/donation-backend:__TAG__
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
