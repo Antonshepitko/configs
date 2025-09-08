@@ -6,12 +6,10 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: donation-backend
+    matchLabels: { app: donation-backend }
   template:
     metadata:
-      labels:
-        app: donation-backend
+      labels: { app: donation-backend }
     spec:
       containers:
       - name: backend
@@ -19,3 +17,10 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
+        env:
+        - name: MONGO_USER
+          valueFrom: { secretKeyRef: { name: mongo-root, key: MONGO_ROOT_USERNAME } }
+        - name: MONGO_PASSWORD
+          valueFrom: { secretKeyRef: { name: mongo-root, key: MONGO_ROOT_PASSWORD } }
+        - name: MONGO_URL
+          value: "mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongodb:27017/donation?authSource=admin"

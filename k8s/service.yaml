@@ -4,8 +4,7 @@ metadata:
   name: donation-backend
   namespace: donation-app
 spec:
-  selector:
-    app: donation-backend
+  selector: { app: donation-backend }
   type: NodePort
   ports:
   - name: http
