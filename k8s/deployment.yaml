@@ -13,10 +13,14 @@ spec:
     spec:
       containers:
       - name: backend
+<<<<<<< HEAD
         image: docker.io/sreenjoyer/donation-backend:latest
+=======
+        image: docker.io/sreenjoyer/donation-backend:c62fa66
+>>>>>>> c6d22119d47579ef06156fe8b8b33060419a3ba4
         imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 8080
+        - containerPort: 5000
         env:
         - name: MONGO_USER
           valueFrom: { secretKeyRef: { name: mongo-root, key: MONGO_ROOT_USERNAME } }
