@@ -1,20 +1,26 @@
-# Опциональный Ingress для более удобного доступа
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: donation-app-ingress
+  name: tipit
   namespace: donation-app
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
+  ingressClassName: nginx
   rules:
-  - host: donation-app.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: donation-nginx
-            port:
-              number: 80
+    - host: 45-144-52-219.nip.io   # nip.io резолвит в 45.144.52.219
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tipit-front
+                port: { number: 80 }
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: donation-backend
+                port: { number: 80 }   # твой backend Service уже 80->5000

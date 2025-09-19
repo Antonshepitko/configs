@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tipit-front
+  namespace: donation-app
+  labels: { app: tipit-front }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: tipit-front }
+  template:
+    metadata:
+      labels: { app: tipit-front }
+    spec:
+      containers:
+        - name: tipit-front
+          image: docker.io/sreenjoyer/tipit-front:latest   # kustomize перебьёт
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_BASE
+              value: "/api"
+            - name: HOSTNAME
+              value: "0.0.0.0"
+            - name: PORT
+              value: "3000"
+          readinessProbe:
+            httpGet: { path: "/", port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: "/", port: 3000 }
+            initialDelaySeconds: 20
+            periodSeconds: 10

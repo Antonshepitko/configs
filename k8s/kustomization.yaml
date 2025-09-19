@@ -7,3 +7,12 @@ resources:
   - mongodb-statefulset.yaml
   - deployment.yaml        # deployment бэкенда
   - service.yaml           # service бэкенда
+  - frontend-deployment.yaml  # front
+  - frontend-service.yaml     # front
+  - ingress.yaml              # ingress
+  
+images:
+  - name: docker.io/sreenjoyer/donation-backend
+    newTag: latest
+  - name: docker.io/sreenjoyer/tipit-front
+    newTag: latest
