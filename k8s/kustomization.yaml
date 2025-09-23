@@ -17,4 +17,4 @@ images:
   newTag: latest
 - name: docker.io/sreenjoyer/tipit-front
   newName: docker.io/sreenjoyer/tipit-front
-  newTag: 32ed7ae
+  newTag: c1b036a
